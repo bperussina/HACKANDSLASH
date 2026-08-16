@@ -1,0 +1,26 @@
+---
+description: Three.js action-RPG architecture for HACKANDSLASH
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Simulation, then meshes
+
+- Miniplex entities own position, health, shotgun, slash, and silhouette. Meshes copy transforms in PresentationSystem.
+- Talk across systems only through `EventBus` (`domain:action`). Do not import CombatSystem from WaveSystem.
+- Put every balance number in `src/core/Constants.ts`.
+- Gameplay reads `InputSample` only — never raw keyboard/gamepad/touch events.
+- `CameraSystem` owns over-the-shoulder and isometric. Default new run is OTS. Toggle is a control, not a cutscene.
+- `GameState.reset()` plus dispose/pool recycle on every restart. Leaked listeners and undisposed geometries are bugs.
+- Use `renderer.setAnimationLoop`, cap delta at 0.1, fixed 1/60 combat step.
+- Do not add React Three Fiber, Drei, EffectComposer, or shadow maps unless a spec says so.
+- Do not add Demolisher voice lines.
+
+```ts
+// BAD — mesh is the player
+hero.mesh.position.x += speed;
+
+// GOOD — sim first, view later
+hero.position.x += speed * dt;
+hero.mesh.position.copy(hero.position);
+```
