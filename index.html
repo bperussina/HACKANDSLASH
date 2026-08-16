@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Demolisher — The Wound</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #0a0605;
+        color: #d8c4b0;
+        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+      }
+      #game-container {
+        position: fixed;
+        inset: 0;
+      }
+      #game-container canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      #loading,
+      #hint {
+        position: fixed;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+      #loading {
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: #0a0605;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        font-size: 13px;
+      }
+      #loading.hidden {
+        display: none;
+      }
+      #hint {
+        bottom: max(16px, env(safe-area-inset-bottom));
+        text-align: center;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <div id="loading">The lock breaks</div>
+    <div id="hint">WASD move · Mouse aim · Click shoot · Right-click / J slash · V camera</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

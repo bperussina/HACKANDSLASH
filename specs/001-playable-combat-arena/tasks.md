@@ -14,12 +14,12 @@
 
 **Purpose**: Vite + TypeScript app that boots a blank WebGL canvas
 
-- [ ] T001 Create root `.gitignore` ignoring `node_modules/`, `dist/`, `.env`, and OS junk
-- [ ] T002 Initialize `package.json` with `"type": "module"` and scripts `dev`, `build`, `preview`, `test` per plan.md
-- [ ] T003 [P] Add `tsconfig.json` (strict, ES2022, bundler resolution) and `vite.config.ts` (port 3000, open, `publicDir`)
-- [ ] T004 [P] Create `index.html` with `#game-container`, overlay roots, and `/src/main.ts` entry
-- [ ] T005 Install runtime deps `three@0.185`, `miniplex`, `@dimforge/rapier3d-compat`, `howler` and dev deps `vite`, `typescript`, `vitest`, `stats.js`, `lil-gui`
-- [ ] T006 Create empty folders `src/core`, `src/systems`, `src/gameplay`, `src/level`, `src/ui`, `src/debug`, `tests`, `public/models`, `public/audio`
+- [x] T001 Create root `.gitignore` ignoring `node_modules/`, `dist/`, `.env`, and OS junk
+- [x] T002 Initialize `package.json` with `"type": "module"` and scripts `dev`, `build`, `preview`, `test` per plan.md
+- [x] T003 [P] Add `tsconfig.json` (strict, ES2022, bundler resolution) and `vite.config.ts` (port 3000, open, `publicDir`)
+- [x] T004 [P] Create `index.html` with `#game-container`, overlay roots, and `/src/main.ts` entry
+- [x] T005 Install runtime deps `three@0.185`, `miniplex`, `@dimforge/rapier3d-compat`, `howler` and dev deps `vite`, `typescript`, `vitest`, `stats.js`, `lil-gui`
+- [x] T006 Create empty folders `src/core`, `src/systems`, `src/gameplay`, `src/level`, `src/ui`, `src/debug`, `tests`, `public/models`, `public/audio`
 
 **Checkpoint**: `npm run dev` shows a page; `npm run build` succeeds with a stub `main.ts`
 
@@ -31,20 +31,20 @@
 
 **⚠️ CRITICAL**: No user story work until this phase is complete
 
-- [ ] T007 Implement EventBus + `Events` in `src/core/EventBus.ts` per `specs/001-playable-combat-arena/contracts/events.md`
-- [ ] T008 [P] Implement GameState with `reset()` / `patch()` in `src/core/GameState.ts` per `contracts/gamestate.md` (default `cameraMode: 'ots'`, `silhouetteStage: 0`)
-- [ ] T009 [P] Fill `src/core/Constants.ts` with DEMOLISHER, SHOTGUN, SLASH, EXECUTE, FODDER, CHAMPION, WAVE, CAMERA_OTS, CAMERA_ISO, WOUND, COLORS, ASSET_PATHS
-- [ ] T010 [P] Define Miniplex types and `createWorld()` in `src/core/World.ts` per `data-model.md`
-- [ ] T011 Implement Game orchestrator in `src/core/Game.ts`: WebGLRenderer (high-performance, pixel ratio cap 2), ash fog, lights, `setAnimationLoop`, delta cap 0.1, fixed 1/60 accumulator, resize, visibility pause
-- [ ] T012 Wire `src/main.ts` to construct Game and `init()`
-- [ ] T013 Implement InputSystem in `src/systems/InputSystem.ts` per `contracts/input.md` (keyboard + mouse first; touch/gamepad stubs OK until US5)
-- [ ] T014 Implement PhysicsSystem in `src/systems/PhysicsSystem.ts` (Rapier world, ground cuboid, step, dispose on reset)
-- [ ] T015 Implement AssetLoader in `src/level/AssetLoader.ts` with `LoadingManager`; emit `game:loaded`; primitive fallbacks if GLBs missing
-- [ ] T016 Build The Wound (ash floor, walls, chained-dummy marker) in `src/level/ArenaBuilder.ts` with Rapier colliders
-- [ ] T017 Implement CameraSystem in `src/systems/CameraSystem.ts` with OTS and isometric rigs, toggle, queued toggle during rips, no OrbitControls in play
-- [ ] T018 Implement PresentationSystem stub in `src/systems/PresentationSystem.ts` (copy transforms; Hell-iron palette)
-- [ ] T019 [P] Add `src/debug/stats.ts` and `src/systems/DevOverlay.ts` (stats + `renderer.info` + lil-gui) gated by `import.meta.env.DEV`
-- [ ] T020 Add Vitest config and smoke test that EventBus + GameState.reset restore OTS and silhouette 0 in `tests/reset.test.ts`
+- [x] T007 Implement EventBus + `Events` in `src/core/EventBus.ts` per `specs/001-playable-combat-arena/contracts/events.md`
+- [x] T008 [P] Implement GameState with `reset()` / `patch()` in `src/core/GameState.ts` per `contracts/gamestate.md` (default `cameraMode: 'ots'`, `silhouetteStage: 0`)
+- [x] T009 [P] Fill `src/core/Constants.ts` with DEMOLISHER, SHOTGUN, SLASH, EXECUTE, FODDER, CHAMPION, WAVE, CAMERA_OTS, CAMERA_ISO, WOUND, COLORS, ASSET_PATHS
+- [x] T010 [P] Define Miniplex types and `createWorld()` in `src/core/World.ts` per `data-model.md`
+- [x] T011 Implement Game orchestrator in `src/core/Game.ts`: WebGLRenderer (high-performance, pixel ratio cap 2), ash fog, lights, `setAnimationLoop`, delta cap 0.1, fixed 1/60 accumulator, resize, visibility pause
+- [x] T012 Wire `src/main.ts` to construct Game and `init()`
+- [x] T013 Implement InputSystem in `src/systems/InputSystem.ts` per `contracts/input.md` (keyboard + mouse first; touch/gamepad stubs OK until US5)
+- [x] T014 Implement PhysicsSystem in `src/systems/PhysicsSystem.ts` (Rapier world, ground cuboid, step, dispose on reset)
+- [x] T015 Implement AssetLoader in `src/level/AssetLoader.ts` with `LoadingManager`; emit `game:loaded`; primitive fallbacks if GLBs missing
+- [x] T016 Build The Wound (ash floor, walls, chained-dummy marker) in `src/level/ArenaBuilder.ts` with Rapier colliders
+- [x] T017 Implement CameraSystem in `src/systems/CameraSystem.ts` with OTS and isometric rigs, toggle, queued toggle during rips, no OrbitControls in play
+- [x] T018 Implement PresentationSystem stub in `src/systems/PresentationSystem.ts` (copy transforms; Hell-iron palette)
+- [x] T019 [P] Add `src/debug/stats.ts` and `src/systems/DevOverlay.ts` (stats + `renderer.info` + lil-gui) gated by `import.meta.env.DEV`
+- [x] T020 Add Vitest config and smoke test that EventBus + GameState.reset restore OTS and silhouette 0 in `tests/reset.test.ts`
 
 **Checkpoint**: Empty Wound, both cameras toggle, loop runs, tab-hide pauses, overlay in DEV
 
@@ -56,16 +56,16 @@
 
 **Independent Test**: OTS default, toggle iso, dummy flinches only on real shotgun cone and blade arc
 
-- [ ] T021 [P] [US1] Add object pools in `src/gameplay/pools.ts` (meshes, colliders, blasts, slashes)
-- [ ] T022 [P] [US1] Spawn Demolisher + kinematic capsule in `src/gameplay/demolisher.ts` (already-strong Constants, Hell-iron look)
-- [ ] T023 [US1] Implement MovementSystem in `src/systems/MovementSystem.ts` (move relative to current camera yaw, bounds, facing from aim)
-- [ ] T024 [US1] Implement shotgun blast entity + cone query in `src/gameplay/shotgun.ts`
-- [ ] T025 [US1] Implement slash entity + arc in `src/gameplay/slash.ts`
-- [ ] T026 [US1] Implement CombatSystem shoot/slash windows, same-frame rule, recovery ignore in `src/systems/CombatSystem.ts`
-- [ ] T027 [US1] Spawn chained dummy in `src/gameplay/dummy.ts`; apply shotgun and slash hits; emit `dummy:hit`
-- [ ] T028 [US1] Placeholder shoot/slash/idle/run in `src/systems/AnimationSystem.ts`
-- [ ] T029 [US1] Dummy flinch + muzzle/blade spark in `src/systems/PresentationSystem.ts`
-- [ ] T030 [US1] Add `tests/combat.test.ts` for cone hit/miss, arc hit/miss, recovery ignore, same-frame rule
+- [x] T021 [P] [US1] Add object pools in `src/gameplay/pools.ts` (meshes, colliders, blasts, slashes)
+- [x] T022 [P] [US1] Spawn Demolisher + kinematic capsule in `src/gameplay/demolisher.ts` (already-strong Constants, Hell-iron look)
+- [x] T023 [US1] Implement MovementSystem in `src/systems/MovementSystem.ts` (move relative to current camera yaw, bounds, facing from aim)
+- [x] T024 [US1] Implement shotgun blast entity + cone query in `src/gameplay/shotgun.ts`
+- [x] T025 [US1] Implement slash entity + arc in `src/gameplay/slash.ts`
+- [x] T026 [US1] Implement CombatSystem shoot/slash windows, same-frame rule, recovery ignore in `src/systems/CombatSystem.ts`
+- [x] T027 [US1] Spawn chained dummy in `src/gameplay/dummy.ts`; apply shotgun and slash hits; emit `dummy:hit`
+- [x] T028 [US1] Placeholder shoot/slash/idle/run in `src/systems/AnimationSystem.ts`
+- [x] T029 [US1] Dummy flinch + muzzle/blade spark in `src/systems/PresentationSystem.ts`
+- [x] T030 [US1] Add `tests/combat.test.ts` for cone hit/miss, arc hit/miss, recovery ignore, same-frame rule
 
 **Checkpoint**: P1 is a game. Stop and play it.
 
