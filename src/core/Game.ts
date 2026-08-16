@@ -9,7 +9,7 @@ import { releaseFodder, separateFodder, spawnWoundPack, stepFodder } from '../ga
 import { InputSystem } from '../systems/InputSystem.ts';
 import { PhysicsSystem } from '../systems/PhysicsSystem.ts';
 import { CameraSystem } from '../systems/CameraSystem.ts';
-import { MovementSystem } from '../systems/MovementSystem.ts';
+import { MovementSystem, applyFacing } from '../systems/MovementSystem.ts';
 import { CombatSystem } from '../systems/CombatSystem.ts';
 import { PresentationSystem } from '../systems/PresentationSystem.ts';
 import { AnimationSystem } from '../systems/AnimationSystem.ts';
@@ -93,10 +93,8 @@ export class Game {
     const ripping = this.hero.executeState === 'ripping';
     this.cameras.flushQueue(ripping);
 
-    const aim = this.aimPoint();
-    if (Math.hypot(aim.x, aim.z) > 0.05) {
-      this.hero.facing = Math.atan2(aim.x, aim.z);
-    }
+    const iso = gameState.current.cameraMode === 'iso';
+    const aim = iso ? this.aimPoint() : { x: 0, z: 0 };
     const sample = this.input.sample(this.hero.facing ?? 0, aim.x, aim.z);
 
     if (sample.cameraTogglePressed) this.cameras.requestToggle(ripping);
@@ -111,7 +109,9 @@ export class Game {
     }
 
     const playing = this.started && !gameState.current.paused;
+    const lookDelta = this.input.consumeLookDelta();
     if (playing) {
+      applyFacing(this.hero, gameState.current.cameraMode, lookDelta, aim.x, aim.z);
       this.accumulator += delta;
       let steps = 0;
       while (this.accumulator >= FIXED_DT && steps < MAX_SUBSTEPS) {

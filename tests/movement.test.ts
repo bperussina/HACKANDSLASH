@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { rotateMove } from '../src/systems/InputSystem.ts';
+import { applyFacing } from '../src/systems/MovementSystem.ts';
+import { spawnDemolisher } from '../src/gameplay/demolisher.ts';
 import { CameraSystem } from '../src/systems/CameraSystem.ts';
 import { gameState } from '../src/core/GameState.ts';
 import { CAMERA_ISO } from '../src/core/Constants.ts';
@@ -35,6 +37,29 @@ describe('WASD vs heading', () => {
     const move = rotateMove(0, 1, Math.PI / 2);
     nearly(move.x, 1);
     nearly(move.z, 0);
+  });
+});
+
+describe('look vs aim', () => {
+  it('turns from mouse look in over-the-shoulder and ignores ground aim', () => {
+    const hero = spawnDemolisher();
+    hero.facing = 0;
+    applyFacing(hero, 'ots', 0.4, 10, 0);
+    nearly(hero.facing ?? 0, 0.4);
+  });
+
+  it('does not spin when the isometric cursor sits on the Demolisher', () => {
+    const hero = spawnDemolisher();
+    hero.facing = Math.PI;
+    applyFacing(hero, 'iso', 0, 0.2, 0.2);
+    nearly(hero.facing ?? 0, Math.PI);
+  });
+
+  it('faces a distant ground point in isometric', () => {
+    const hero = spawnDemolisher();
+    hero.facing = 0;
+    applyFacing(hero, 'iso', 0.9, 8, 0);
+    nearly(hero.facing ?? 0, Math.PI / 2);
   });
 });
 

@@ -1,4 +1,5 @@
 import { yawToDir } from '../gameplay/shotgun.ts';
+import { CAMERA_OTS } from '../core/Constants.ts';
 
 export type InputSample = {
   moveX: number;
@@ -11,6 +12,7 @@ export type InputSample = {
   cameraTogglePressed: boolean;
   pausePressed: boolean;
   mutePressed: boolean;
+  lookDelta: number;
 };
 
 export const EMPTY_INPUT: InputSample = {
@@ -24,6 +26,7 @@ export const EMPTY_INPUT: InputSample = {
   cameraTogglePressed: false,
   pausePressed: false,
   mutePressed: false,
+  lookDelta: 0,
 };
 
 export class InputSystem {
@@ -39,6 +42,7 @@ export class InputSystem {
   private mouseRight = false;
   private prevMouseLeft = false;
   private prevMouseRight = false;
+  private lookDx = 0;
 
   attach(canvas: HTMLElement): void {
     window.addEventListener('keydown', this.onKeyDown);
@@ -106,7 +110,14 @@ export class InputSystem {
       cameraTogglePressed,
       pausePressed,
       mutePressed,
+      lookDelta: 0,
     };
+  }
+
+  consumeLookDelta(): number {
+    const delta = Math.max(-CAMERA_OTS.LOOK_MAX, Math.min(CAMERA_OTS.LOOK_MAX, this.lookDx * CAMERA_OTS.LOOK_SENS));
+    this.lookDx = 0;
+    return delta;
   }
 
   private consume(value: boolean): boolean {
@@ -139,6 +150,7 @@ export class InputSystem {
     const rect = target.getBoundingClientRect();
     this.mouseNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouseNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    this.lookDx += event.movementX;
   };
 
   private onPointerDown = (event: PointerEvent): void => {

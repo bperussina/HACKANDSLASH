@@ -3,6 +3,7 @@ export const MAX_SUBSTEPS = 5;
 export const DELTA_CAP = 0.1;
 export const PIXEL_RATIO_CAP = 2;
 export const STICK_DEADZONE = 0.15;
+export const AIM_DEADZONE = 2.2;
 
 export const DEMOLISHER = {
   HEALTH: 220,
@@ -72,6 +73,8 @@ export const CAMERA_OTS = {
   LOOK_HEIGHT: 1.45,
   SHOULDER: 1.05,
   LERP: 10,
+  LOOK_SENS: 0.0032,
+  LOOK_MAX: 0.4,
 };
 
 export const CAMERA_ISO = {
