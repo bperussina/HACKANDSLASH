@@ -10,9 +10,10 @@
         margin: 0;
         height: 100%;
         overflow: hidden;
-        background: #0a0605;
-        color: #d8c4b0;
-        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+        background: #1a1410;
+        color: #c4b7a6;
+        font-family: "Arial Narrow", "Franklin Gothic Condensed", Impact, "Helvetica Neue", sans-serif;
+        font-weight: 700;
       }
       #game-container {
         position: fixed;
@@ -24,10 +25,9 @@
         height: 100%;
       }
       #loading,
-      #hint {
+      #hint,
+      #hud {
         position: fixed;
-        left: 0;
-        right: 0;
         pointer-events: none;
         z-index: 5;
       }
@@ -35,26 +35,82 @@
         inset: 0;
         display: grid;
         place-items: center;
-        background: #0a0605;
-        letter-spacing: 0.28em;
+        background: #1a1410;
+        letter-spacing: 0.42em;
         text-transform: uppercase;
-        font-size: 13px;
+        font-size: 14px;
+        color: #e0c36a;
       }
       #loading.hidden {
         display: none;
       }
+      #hud {
+        top: max(16px, env(safe-area-inset-top));
+        left: max(16px, env(safe-area-inset-left));
+        min-width: 220px;
+      }
+      .hud-plate {
+        background: #3d342c;
+        border: 3px solid #1a1410;
+        box-shadow: 4px 4px 0 #1a1410;
+        padding: 10px 12px 12px;
+      }
+      .hud-label {
+        font-size: 11px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #e0c36a;
+        margin-bottom: 6px;
+      }
+      .hud-trough {
+        height: 10px;
+        background: #1a1410;
+        overflow: hidden;
+      }
+      #hud-health {
+        height: 100%;
+        width: 100%;
+        background: #c41e3a;
+        transform-origin: left center;
+        transform: scaleX(1);
+      }
+      .hud-meta {
+        display: flex;
+        gap: 16px;
+        margin-top: 8px;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #c4b7a6;
+      }
+      .hud-meta b {
+        color: #e0c36a;
+        font-weight: 700;
+      }
       #hint {
+        left: 0;
+        right: 0;
         bottom: max(16px, env(safe-area-inset-bottom));
         text-align: center;
         font-size: 12px;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.16em;
         text-transform: uppercase;
-        opacity: 0.8;
+        color: #c4b7a6;
       }
     </style>
   </head>
   <body>
     <div id="game-container"></div>
+    <div id="hud">
+      <div class="hud-plate">
+        <div class="hud-label">The Wound</div>
+        <div class="hud-trough"><div id="hud-health"></div></div>
+        <div class="hud-meta">
+          <span>Wave <b id="hud-wave">1</b></span>
+          <span>Kills <b id="hud-kills">0</b></span>
+        </div>
+      </div>
+    </div>
     <div id="loading">The lock breaks</div>
     <div id="hint">WASD move · Mouse aim · Click shoot · Right-click / J slash · V camera</div>
     <script type="module" src="/src/main.ts"></script>

@@ -19,7 +19,7 @@ import { ArenaBuilder } from '../level/ArenaBuilder.ts';
 export class Game {
   private renderer!: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
-  private clock = new THREE.Clock();
+  private lastFrame = 0;
   private accumulator = 0;
   private world = createWorld();
   private hero!: Entity;
@@ -53,6 +53,8 @@ export class Game {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, PIXEL_RATIO_CAP));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.NoToneMapping;
+    this.renderer.shadowMap.enabled = false;
     host.appendChild(this.renderer.domElement);
 
     await this.physics.init();
@@ -77,11 +79,14 @@ export class Game {
     });
 
     this.assets.load();
-    this.renderer.setAnimationLoop(() => this.tick());
+    this.renderer.setAnimationLoop((time) => this.tick(time));
   }
 
-  private tick(): void {
-    const delta = Math.min(this.clock.getDelta(), DELTA_CAP);
+  private tick(time?: number): void {
+    const now = time ?? performance.now();
+    if (this.lastFrame === 0) this.lastFrame = now;
+    const delta = Math.min((now - this.lastFrame) / 1000, DELTA_CAP);
+    this.lastFrame = now;
     const ripping = this.hero.executeState === 'ripping';
     this.cameras.flushQueue(ripping);
 
@@ -113,16 +118,23 @@ export class Game {
     }
 
     this.presentation.sync(this.hero, this.dummy, delta);
-    this.animation.step(
-      this.hero,
-      this.dummy,
-      this.presentation.group.children[0]!,
-      this.presentation.group.children[1]!,
-      delta,
-    );
+    this.animation.step(this.hero, this.dummy, this.presentation.heroMesh, this.presentation.dummyMesh, delta);
     this.cameras.follow(this.hero, delta);
+    this.syncHud();
     this.renderer.render(this.scene, this.cameras.camera);
     this.overlay.frame(this.renderer);
+  }
+
+  private syncHud(): void {
+    const health = document.getElementById('hud-health');
+    const wave = document.getElementById('hud-wave');
+    const kills = document.getElementById('hud-kills');
+    if (health) {
+      const max = Math.max(1, gameState.current.heroMaxHealth);
+      health.style.transform = `scaleX(${gameState.current.heroHealth / max})`;
+    }
+    if (wave) wave.textContent = String(gameState.current.waveIndex);
+    if (kills) kills.textContent = String(gameState.current.kills);
   }
 
   private aimPoint(): { x: number; z: number } {
@@ -145,6 +157,6 @@ export class Game {
     this.hiddenPause = document.hidden;
     gameState.patch({ paused: this.userPaused || this.hiddenPause });
     eventBus.emit(Events.gamePaused, { paused: gameState.current.paused });
-    if (!document.hidden) this.clock.getDelta();
+    if (!document.hidden) this.lastFrame = 0;
   };
 }

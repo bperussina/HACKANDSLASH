@@ -57,25 +57,30 @@ export class CameraSystem {
 
     if (gameState.current.cameraMode === 'ots') {
       const back = CAMERA_OTS.DISTANCE;
+      const shoulder = CAMERA_OTS.SHOULDER;
+      const fx = Math.sin(facing);
+      const fz = Math.cos(facing);
+      const rx = Math.cos(facing);
+      const rz = -Math.sin(facing);
       target.set(
-        pos.x - Math.sin(facing) * back,
+        pos.x - fx * back + rx * shoulder,
         pos.y + CAMERA_OTS.HEIGHT,
-        pos.z - Math.cos(facing) * back,
+        pos.z - fz * back + rz * shoulder,
       );
       look.set(
-        pos.x + Math.sin(facing) * CAMERA_OTS.LOOK_AHEAD,
+        pos.x + fx * CAMERA_OTS.LOOK_AHEAD,
         pos.y + CAMERA_OTS.LOOK_HEIGHT,
-        pos.z + Math.cos(facing) * CAMERA_OTS.LOOK_AHEAD,
+        pos.z + fz * CAMERA_OTS.LOOK_AHEAD,
       );
-      this.camera.fov = 55;
+      this.camera.fov = 52;
     } else {
       target.set(
         pos.x + CAMERA_ISO.OFFSET_X,
         pos.y + CAMERA_ISO.OFFSET_Y,
         pos.z + CAMERA_ISO.OFFSET_Z,
       );
-      look.set(pos.x, pos.y + 0.4, pos.z);
-      this.camera.fov = 45;
+      look.set(pos.x, pos.y + 0.95, pos.z);
+      this.camera.fov = 42;
     }
 
     const lerp = (gameState.current.cameraMode === 'ots' ? CAMERA_OTS.LERP : CAMERA_ISO.LERP) * dt;
