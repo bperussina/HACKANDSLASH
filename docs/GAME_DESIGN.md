@@ -2,7 +2,7 @@
 
 Hack-and-slash action RPG. You are a god of violence that Hell and Heaven both tried to use. Now you hunt both of them.
 
-This is the creative bible. Combat systems and Three.js rules live in the constitution and the playable-arena spec. If those conflict with feel, the constitution still wins on engineering. This file wins on fantasy.
+This is the creative bible. How it looks lives in [`ART_STYLE.md`](ART_STYLE.md). Combat systems and Three.js rules live in the constitution and the playable-arena spec. If those conflict with feel, the constitution still wins on engineering. This file wins on fantasy.
 
 **Creative lead**: Brody  
 **Locked**: 2026-08-15
