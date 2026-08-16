@@ -5,9 +5,10 @@
 This repo is set up with [GitHub Spec Kit](https://github.com/github/spec-kit) so we write **what the game is** before we write the code.
 
 Creative bible (fantasy wins here): [`docs/GAME_DESIGN.md`](docs/GAME_DESIGN.md)  
+Art style (how it looks): [`docs/ART_STYLE.md`](docs/ART_STYLE.md)  
 Engineering rules: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 
-## Play (once it is built)
+## Play
 
 ```bash
 npm install
@@ -15,9 +16,15 @@ npm test
 npm run dev
 ```
 
-Then follow [the Wound quickstart](specs/001-playable-combat-arena/quickstart.md).
+Then open `http://localhost:3000`.
 
-The first slice is **The Wound** — not the full campaign. You wake already terrifying. Shotgun opens the pack. Blade finishes what is still standing. You can toggle over-the-shoulder and isometric. Hell swarms you. You rip a champion. You loot ugly iron off the corpse. Heaven comes later.
+- **WASD** move
+- **Mouse** aim
+- **Click** shotgun
+- **Right-click** or **J** blade
+- **V** toggle over-the-shoulder / isometric
+
+The chained dummy flinches only when the cone or arc actually hits. Hell swarms are the next story.
 
 ## How we build
 

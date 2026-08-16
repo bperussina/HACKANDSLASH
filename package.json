@@ -1,0 +1,26 @@
+{
+  "name": "hackandslash",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.20.0",
+    "howler": "^2.2.4",
+    "miniplex": "^2.0.0",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.13",
+    "@types/three": "^0.185.4",
+    "lil-gui": "^0.21.0",
+    "stats.js": "^0.17.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  }
+}
