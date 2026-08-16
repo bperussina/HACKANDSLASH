@@ -1,0 +1,14 @@
+---
+description: Spec Kit workflow — specify before coding, PRs not main
+alwaysApply: true
+---
+
+# Spec-Driven Development
+
+- Read `.specify/memory/constitution.md` before changing gameplay.
+- Read `docs/GAME_DESIGN.md` before changing fantasy, cameras, weapons, loot look, or tone. The bible wins on who you are; the constitution wins on engineering.
+- New behavior starts as a spec under `specs/`, then plan, then tasks. Do not invent large features only in code.
+- Use the numbered feature branch. Do not commit feature work to `main`.
+- Implementation follows `tasks.md` in order: Setup → Foundation → stories. Stop at a story checkpoint and play it.
+- Simulation (shotgun, slash, execute, waves, reset) must stay testable without WebGL.
+- If a change does not make the Demolisher feel more unstoppable, it does not belong.

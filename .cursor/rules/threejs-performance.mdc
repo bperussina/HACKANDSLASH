@@ -1,0 +1,27 @@
+---
+description: Three.js performance budget for hack-and-slash combat
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Stay at 60
+
+- Cap pixel ratio at 2. Prefer `powerPreference: 'high-performance'`.
+- Pool enemies, slashes, and sparks. No `new Mesh` / `new Vector3` in the hot loop.
+- Share geometries and materials. Instance identical fodder if a wave is large.
+- Visual meshes are not colliders. Rapier capsules/boxes only.
+- Dev overlay (`stats.js`, `renderer.info`, entity counts) stays behind `import.meta.env.DEV`.
+- If a frame hitch shows up, measure update vs render before adding more effects.
+
+```ts
+// BAD
+function update() {
+  const dir = new THREE.Vector3(1, 0, 0);
+}
+
+// GOOD
+const _dir = new THREE.Vector3();
+function update() {
+  _dir.set(1, 0, 0);
+}
+```
