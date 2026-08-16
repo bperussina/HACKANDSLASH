@@ -11,6 +11,7 @@ export const DEMOLISHER = {
   HEIGHT: 1.9,
   SHOTGUN_DAMAGE: 42,
   SLASH_DAMAGE: 55,
+  HURT_LOCK: 0.55,
 };
 
 export const SHOTGUN = {
@@ -38,6 +39,18 @@ export const FODDER = {
   HEALTH: 40,
   SPEED: 5.2,
   DAMAGE: 12,
+  RADIUS: 0.36,
+  HEIGHT: 1.05,
+  MELEE_RANGE: 1.45,
+  STARTUP: 0.34,
+  ACTIVE: 0.12,
+  RECOVERY: 0.4,
+  DEATH_FLASH: 0.18,
+  MUTT_HEALTH: 78,
+  MUTT_SPEED: 4.3,
+  MUTT_DAMAGE: 16,
+  MUTT_RADIUS: 0.48,
+  POOL: 12,
 };
 
 export const CHAMPION = {

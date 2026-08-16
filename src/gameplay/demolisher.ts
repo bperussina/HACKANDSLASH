@@ -1,6 +1,12 @@
 import type { Entity } from '../core/World.ts';
 import { vec3 } from '../core/World.ts';
-import { DEMOLISHER, SHOTGUN, SLASH } from '../core/Constants.ts';
+import { COLORS, DEMOLISHER, SHOTGUN, SLASH } from '../core/Constants.ts';
+
+export const HELL_IRON = {
+  plate: COLORS.IRON,
+  rim: COLORS.BONE,
+  leather: COLORS.ASH,
+};
 
 export function spawnDemolisher(): Entity {
   return {
@@ -8,6 +14,8 @@ export function spawnDemolisher(): Entity {
     position: vec3(0, 0, 6),
     facing: Math.PI,
     moveSpeed: DEMOLISHER.SPEED,
+    radius: DEMOLISHER.RADIUS,
+    height: DEMOLISHER.HEIGHT,
     health: DEMOLISHER.HEALTH,
     maxHealth: DEMOLISHER.HEALTH,
     shotgunDamage: DEMOLISHER.SHOTGUN_DAMAGE,

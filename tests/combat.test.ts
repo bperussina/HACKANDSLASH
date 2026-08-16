@@ -1,12 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, afterEach } from 'vitest';
 import { pickSameFrameAction, shotgunHits } from '../src/gameplay/shotgun.ts';
 import { slashHits } from '../src/gameplay/slash.ts';
 import { CombatSystem } from '../src/systems/CombatSystem.ts';
 import { spawnDemolisher } from '../src/gameplay/demolisher.ts';
 import { spawnDummy } from '../src/gameplay/dummy.ts';
+import { acquireFodder } from '../src/gameplay/enemy.ts';
 import { EMPTY_INPUT, type InputSample } from '../src/systems/InputSystem.ts';
-import { SHOTGUN, SLASH } from '../src/core/Constants.ts';
+import { DEMOLISHER, FODDER, SHOTGUN, SLASH } from '../src/core/Constants.ts';
 import { eventBus, Events } from '../src/core/EventBus.ts';
+import { gameState } from '../src/core/GameState.ts';
 
 function press(partial: Partial<InputSample>): InputSample {
   return { ...EMPTY_INPUT, ...partial };
@@ -78,5 +80,75 @@ describe('weapon recovery', () => {
     combat.step(hero, dummy, press({ slashPressed: true }), SLASH.RECOVERY / 2);
     expect(slashes).toBe(1);
     eventBus.clear();
+  });
+});
+
+describe('hell fodder', () => {
+  afterEach(() => {
+    eventBus.clear();
+    gameState.reset();
+  });
+
+  it('dies when a shotgun blast exceeds remaining health', () => {
+    const hero = spawnDemolisher();
+    const dummy = spawnDummy();
+    dummy.position = { x: 40, y: 0, z: 40 };
+    hero.position = { x: 0, y: 0, z: 0 };
+    hero.facing = 0;
+    const fodder = acquireFodder('imp', 0, 5);
+    const combat = new CombatSystem();
+    let deaths = 0;
+    eventBus.on(Events.enemyDied, () => {
+      deaths += 1;
+    });
+    combat.step(hero, dummy, press({ shootPressed: true }), SHOTGUN.STARTUP, [fodder]);
+    expect(fodder.alive).toBe(false);
+    expect(fodder.health).toBe(0);
+    expect(deaths).toBe(1);
+  });
+
+  it('dies when a slash exceeds remaining health', () => {
+    const hero = spawnDemolisher();
+    const dummy = spawnDummy();
+    dummy.position = { x: 40, y: 0, z: 40 };
+    hero.position = { x: 0, y: 0, z: 0 };
+    hero.facing = 0;
+    const fodder = acquireFodder('imp', 0, 2);
+    const combat = new CombatSystem();
+    let deaths = 0;
+    eventBus.on(Events.enemyDied, () => {
+      deaths += 1;
+    });
+    combat.step(hero, dummy, press({ slashPressed: true }), SLASH.STARTUP, [fodder]);
+    expect(fodder.alive).toBe(false);
+    expect(deaths).toBe(1);
+  });
+
+  it('applies only one overlapping melee hit while hurtLock is up', () => {
+    const hero = spawnDemolisher();
+    const dummy = spawnDummy();
+    dummy.position = { x: 40, y: 0, z: 40 };
+    hero.position = { x: 0, y: 0, z: 0 };
+    const a = acquireFodder('imp', 0, 1);
+    const b = acquireFodder('imp', 0, -1);
+    a.attackState = 'startup';
+    a.attackTimer = 0.001;
+    b.attackState = 'startup';
+    b.attackTimer = 0.001;
+    const combat = new CombatSystem();
+    let hits = 0;
+    eventBus.on(Events.playerHit, () => {
+      hits += 1;
+    });
+    combat.step(hero, dummy, press({}), 0.001, [a, b]);
+    expect(hits).toBe(1);
+    expect(hero.health).toBe(DEMOLISHER.HEALTH - FODDER.DAMAGE);
+    expect(hero.hurtLock).toBeGreaterThan(0);
+    const late = acquireFodder('imp', 1, 0);
+    late.attackState = 'startup';
+    late.attackTimer = 0.001;
+    combat.step(hero, dummy, press({}), 0.001, [a, b, late]);
+    expect(hits).toBe(1);
+    expect(hero.health).toBe(DEMOLISHER.HEALTH - FODDER.DAMAGE);
   });
 });

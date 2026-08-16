@@ -5,6 +5,7 @@ import { gameState } from './GameState.ts';
 import { createWorld, type Entity } from './World.ts';
 import { spawnDemolisher } from '../gameplay/demolisher.ts';
 import { spawnDummy } from '../gameplay/dummy.ts';
+import { releaseFodder, separateFodder, spawnWoundPack, stepFodder } from '../gameplay/enemy.ts';
 import { InputSystem } from '../systems/InputSystem.ts';
 import { PhysicsSystem } from '../systems/PhysicsSystem.ts';
 import { CameraSystem } from '../systems/CameraSystem.ts';
@@ -24,6 +25,7 @@ export class Game {
   private world = createWorld();
   private hero!: Entity;
   private dummy!: Entity;
+  private fodder: Entity[] = [];
   private input = new InputSystem();
   private physics = new PhysicsSystem();
   private cameras = new CameraSystem();
@@ -63,6 +65,7 @@ export class Game {
 
     this.hero = this.world.add(spawnDemolisher());
     this.dummy = this.world.add(spawnDummy());
+    this.fodder = spawnWoundPack(this.hero).map((enemy) => this.world.add(enemy));
 
     this.input.attach(this.renderer.domElement);
     this.cameras.resize(window.innerWidth, window.innerHeight);
@@ -111,18 +114,31 @@ export class Game {
       while (this.accumulator >= FIXED_DT && steps < MAX_SUBSTEPS) {
         this.physics.step(FIXED_DT);
         this.movement.step(this.hero, sample, FIXED_DT);
-        this.combat.step(this.hero, this.dummy, sample, FIXED_DT);
+        for (const enemy of this.fodder) stepFodder(enemy, this.hero, FIXED_DT);
+        separateFodder(this.fodder);
+        this.combat.step(this.hero, this.dummy, sample, FIXED_DT, this.fodder);
+        this.reapFodder();
         this.accumulator -= FIXED_DT;
         steps += 1;
       }
     }
 
-    this.presentation.sync(this.hero, this.dummy, delta);
+    this.presentation.sync(this.hero, this.dummy, this.fodder, delta);
     this.animation.step(this.hero, this.dummy, this.presentation.heroMesh, this.presentation.dummyMesh, delta);
     this.cameras.follow(this.hero, delta);
     this.syncHud();
     this.renderer.render(this.scene, this.cameras.camera);
     this.overlay.frame(this.renderer);
+  }
+
+  private reapFodder(): void {
+    for (let i = this.fodder.length - 1; i >= 0; i -= 1) {
+      const enemy = this.fodder[i]!;
+      if (enemy.alive || (enemy.deathFlash ?? 0) > 0) continue;
+      this.world.remove(enemy);
+      releaseFodder(enemy);
+      this.fodder.splice(i, 1);
+    }
   }
 
   private syncHud(): void {

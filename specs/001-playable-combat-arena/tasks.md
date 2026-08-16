@@ -77,11 +77,11 @@
 
 **Independent Test**: Shotgun one, blade one, pack of 3+ still shows the Demolisher
 
-- [ ] T031 [P] [US2] Pooled Hell fodder in `src/gameplay/enemy.ts` (kinds, chase, melee windup)
-- [ ] T032 [US2] Extend CombatSystem in `src/systems/CombatSystem.ts` for fodder strikes vs hurtLock and player weapons vs fodder HP; emit `enemy:hit` / `enemy:died` / `player:hit`
-- [ ] T033 [US2] Death pooling + Hell death flash in `src/gameplay/pools.ts` and `src/systems/PresentationSystem.ts`
-- [ ] T034 [US2] Demolisher contrast (dark iron + rim) vs red-brown fodder in `src/gameplay/demolisher.ts`
-- [ ] T035 [US2] Extend `tests/combat.test.ts` for fodder death and overlapping-hit hurtLock
+- [x] T031 [P] [US2] Pooled Hell fodder in `src/gameplay/enemy.ts` (kinds, chase, melee windup)
+- [x] T032 [US2] Extend CombatSystem in `src/systems/CombatSystem.ts` for fodder strikes vs hurtLock and player weapons vs fodder HP; emit `enemy:hit` / `enemy:died` / `player:hit`
+- [x] T033 [US2] Death pooling + Hell death flash in `src/gameplay/pools.ts` and `src/systems/PresentationSystem.ts`
+- [x] T034 [US2] Demolisher contrast (dark iron + rim) vs red-brown fodder in `src/gameplay/demolisher.ts`
+- [x] T035 [US2] Extend `tests/combat.test.ts` for fodder death and overlapping-hit hurtLock
 
 **Checkpoint**: Massacre works; dummy still works
 

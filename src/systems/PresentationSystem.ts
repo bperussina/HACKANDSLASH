@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { COLORS, SLASH } from '../core/Constants.ts';
+import { COLORS, FODDER, SLASH } from '../core/Constants.ts';
 import { eventBus, Events } from '../core/EventBus.ts';
 import type { Entity } from '../core/World.ts';
+import { HELL_IRON } from '../gameplay/demolisher.ts';
 
 function mat(color: number, extras: ConstructorParameters<typeof THREE.MeshStandardMaterial>[0] = {}) {
   return new THREE.MeshStandardMaterial({
@@ -48,6 +49,13 @@ function trapezoid(
   return mesh;
 }
 
+type FodderView = {
+  root: THREE.Group;
+  mouthMat: THREE.MeshStandardMaterial;
+  bodyMat: THREE.MeshStandardMaterial;
+  flashMat: THREE.MeshBasicMaterial;
+};
+
 export class PresentationSystem {
   readonly group = new THREE.Group();
   readonly heroMesh = new THREE.Group();
@@ -57,6 +65,9 @@ export class PresentationSystem {
   private sparks: THREE.Mesh[] = [];
   private slashArc: THREE.Mesh;
   private dummyMats: THREE.MeshStandardMaterial[] = [];
+  private fodderViews: FodderView[] = [];
+  private fodderById = new Map<number, FodderView>();
+  private freeFodder: FodderView[] = [];
   private muzzleTime = 0;
   private bladeTime = 0;
   private visorClock = 0;
@@ -109,6 +120,14 @@ export class PresentationSystem {
     this.slashArc.position.set(0, 1.05, 0);
     this.heroMesh.add(this.slashArc);
 
+    for (let i = 0; i < FODDER.POOL; i += 1) {
+      const view = this.buildFodderView();
+      view.root.visible = false;
+      this.fodderViews.push(view);
+      this.freeFodder.push(view);
+      this.group.add(view.root);
+    }
+
     this.group.add(this.heroMesh, this.dummyMesh);
 
     eventBus.on(Events.playerShoot, () => {
@@ -119,7 +138,7 @@ export class PresentationSystem {
     });
   }
 
-  sync(hero: Entity, dummy: Entity, dt: number): void {
+  sync(hero: Entity, dummy: Entity, fodder: Entity[], dt: number): void {
     this.heroMesh.position.set(hero.position.x, 0, hero.position.z);
     this.heroMesh.rotation.y = hero.facing ?? 0;
     this.dummyMesh.position.set(dummy.position.x, 0, dummy.position.z);
@@ -149,25 +168,113 @@ export class PresentationSystem {
 
     this.visorClock += dt;
     this.visorMat.emissiveIntensity = 1.28 + Math.sin(this.visorClock * 3.1) * 0.18;
+
+    this.syncFodder(fodder);
   }
 
   dispose(): void {
+    const seen = new Set<THREE.Material>();
     this.group.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        obj.geometry.dispose();
-        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
-        for (const material of materials) material.dispose();
+      if (!(obj instanceof THREE.Mesh)) return;
+      obj.geometry.dispose();
+      const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const material of materials) {
+        if (seen.has(material)) continue;
+        seen.add(material);
+        material.dispose();
       }
     });
   }
 
+  private syncFodder(fodder: Entity[]): void {
+    const active = new Set<number>();
+    for (const enemy of fodder) {
+      const id = enemy.id;
+      if (id === undefined) continue;
+      const showing = Boolean(enemy.alive) || (enemy.deathFlash ?? 0) > 0;
+      if (!showing) continue;
+      active.add(id);
+      let view = this.fodderById.get(id);
+      if (!view) {
+        view = this.freeFodder.pop();
+        if (!view) continue;
+        this.fodderById.set(id, view);
+      }
+      view.root.visible = true;
+      view.root.position.set(enemy.position.x, 0, enemy.position.z);
+      view.root.rotation.y = enemy.facing ?? 0;
+      const mutt = enemy.fodderKind === 'mutt';
+      view.root.scale.set(mutt ? 1.2 : 1, mutt ? 0.72 : 1, mutt ? 1.45 : 1);
+
+      const winding = enemy.attackState === 'startup';
+      const flashing = (enemy.deathFlash ?? 0) > 0;
+      const hit = (enemy.flinchTimer ?? 0) > 0;
+      view.mouthMat.emissiveIntensity = flashing ? 2.2 : winding ? 1.55 : 0.22;
+      view.bodyMat.emissiveIntensity = flashing ? 0.9 : hit ? 0.45 : 0.05;
+      view.flashMat.opacity = flashing ? 0.9 : 0;
+      if (flashing) {
+        const t = (enemy.deathFlash ?? 0) / FODDER.DEATH_FLASH;
+        view.root.scale.multiplyScalar(0.55 + t * 0.45);
+      }
+    }
+
+    for (const [id, view] of [...this.fodderById.entries()]) {
+      if (active.has(id)) continue;
+      view.root.visible = false;
+      view.flashMat.opacity = 0;
+      this.fodderById.delete(id);
+      this.freeFodder.push(view);
+    }
+  }
+
+  private buildFodderView(): FodderView {
+    const root = new THREE.Group();
+    const bodyMat = mat(COLORS.RUST, {
+      metalness: 0.18,
+      roughness: 0.92,
+      emissive: COLORS.BLOOD,
+      emissiveIntensity: 0.05,
+    });
+    const bone = mat(COLORS.BONE, { metalness: 0.05, roughness: 0.9 });
+    const mouthMat = new THREE.MeshStandardMaterial({
+      color: COLORS.EMBER,
+      emissive: COLORS.EMBER,
+      emissiveIntensity: 0.22,
+      roughness: 0.45,
+      metalness: 0.05,
+    });
+    const flashMat = new THREE.MeshBasicMaterial({
+      color: COLORS.EMBER,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+
+    const body = box(0.52, 0.62, 0.4, bodyMat, 0.04, 0.62, 0.08);
+    body.rotation.x = 0.35;
+    const head = box(0.28, 0.22, 0.26, bodyMat, 0.08, 1.02, 0.22);
+    const mouth = box(0.18, 0.08, 0.1, mouthMat, 0.08, 0.98, 0.36);
+    const armL = box(0.14, 0.48, 0.14, bodyMat, -0.34, 0.7, 0.04);
+    armL.rotation.z = 0.4;
+    const armR = box(0.14, 0.42, 0.18, bone, 0.36, 0.58, 0.1);
+    armR.rotation.z = -0.25;
+    const legL = box(0.16, 0.42, 0.18, bodyMat, -0.14, 0.22, 0);
+    const legR = box(0.16, 0.38, 0.18, bodyMat, 0.16, 0.2, 0.04);
+    const spike = box(0.08, 0.28, 0.08, bone, -0.06, 0.95, -0.08);
+    const flash = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.6), flashMat);
+    flash.position.set(0, 0.7, 0.1);
+    root.add(body, head, mouth, armL, armR, legL, legR, spike, flash);
+    return { root, mouthMat, bodyMat, flashMat };
+  }
+
   private buildDemolisher(): THREE.Group {
     const root = new THREE.Group();
-    const plate = mat(COLORS.IRON, { metalness: 0.58, roughness: 0.55 });
-    const iron = mat(COLORS.IRON, { metalness: 0.5, roughness: 0.68 });
+    const plate = mat(HELL_IRON.plate, { metalness: 0.58, roughness: 0.55 });
+    const iron = mat(HELL_IRON.plate, { metalness: 0.5, roughness: 0.68 });
     const rust = mat(COLORS.RUST, { metalness: 0.25, roughness: 0.88 });
-    const bone = mat(COLORS.BONE, { metalness: 0.05, roughness: 0.9 });
-    const leather = mat(COLORS.ASH, { metalness: 0.08, roughness: 0.96 });
+    const bone = mat(HELL_IRON.rim, { metalness: 0.05, roughness: 0.9 });
+    const leather = mat(HELL_IRON.leather, { metalness: 0.08, roughness: 0.96 });
+    const rim = new THREE.MeshBasicMaterial({ color: HELL_IRON.rim });
     const visorMat = new THREE.MeshStandardMaterial({
       color: COLORS.VISOR,
       emissive: COLORS.VISOR,
@@ -193,12 +300,15 @@ export class PresentationSystem {
     const rightPauldron = box(0.36, 0.18, 0.46, plate, 0.86, 1.62, 0.12);
     rightPauldron.rotation.z = -0.08;
     root.add(leftPauldron, rightPauldron);
+    root.add(box(0.78, 0.05, 0.08, rim, -0.9, 1.9, 0.36));
+    root.add(box(0.4, 0.04, 0.06, rim, 0.84, 1.72, 0.32));
 
     root.add(box(0.3, 0.16, 0.3, leather, 0, 1.78, 0.04));
     const helm = box(0.56, 0.44, 0.54, plate, 0, 1.96, 0.06);
     const visor = box(0.42, 0.08, 0.07, visorMat, 0, 1.94, 0.34);
     const visorTop = box(0.38, 0.05, 0.28, visorMat, 0, 2.2, 0.04);
     root.add(helm, visor, visorTop);
+    root.add(box(0.58, 0.04, 0.06, rim, 0, 2.16, 0.3));
 
     const gun = box(0.56, 0.48, 1.68, iron, 0.68, 1.16, 0.78);
     const gunDoor = box(0.64, 0.54, 0.16, rust, 0.68, 1.16, 1.55);
