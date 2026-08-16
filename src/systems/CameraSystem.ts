@@ -9,7 +9,7 @@ export class CameraSystem {
   queued: CameraMode | null = null;
   private target = new THREE.Vector3();
   private look = new THREE.Vector3();
-  private euler = new THREE.Euler();
+  private forward = new THREE.Vector3();
 
   constructor() {
     this.camera.position.set(0, 8, 12);
@@ -42,11 +42,13 @@ export class CameraSystem {
   }
 
   yaw(): number {
-    if (gameState.current.cameraMode === 'iso') {
-      return Math.atan2(-CAMERA_ISO.OFFSET_X, -CAMERA_ISO.OFFSET_Z);
+    this.camera.getWorldDirection(this.forward);
+    if (Math.hypot(this.forward.x, this.forward.z) < 0.0001) {
+      return gameState.current.cameraMode === 'iso'
+        ? Math.atan2(-CAMERA_ISO.OFFSET_X, -CAMERA_ISO.OFFSET_Z)
+        : 0;
     }
-    const euler = this.euler.setFromQuaternion(this.camera.quaternion, 'YXZ');
-    return euler.y;
+    return Math.atan2(this.forward.x, this.forward.z);
   }
 
   follow(hero: Entity, dt: number): void {

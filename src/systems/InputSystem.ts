@@ -1,3 +1,5 @@
+import { yawToDir } from '../gameplay/shotgun.ts';
+
 export type InputSample = {
   moveX: number;
   moveZ: number;
@@ -70,10 +72,9 @@ export class InputSystem {
       z /= len;
     }
 
-    const cos = Math.cos(cameraYaw);
-    const sin = Math.sin(cameraYaw);
-    const moveX = x * cos + z * sin;
-    const moveZ = z * cos - x * sin;
+    const moved = rotateMove(x, z, cameraYaw);
+    const moveX = moved.x;
+    const moveZ = moved.z;
 
     const shootKey = this.consume(this.shootEdge);
     const slashKey = this.consume(this.slashEdge);
@@ -152,5 +153,16 @@ export class InputSystem {
 
   private onContextMenu = (event: Event): void => {
     event.preventDefault();
+  };
+}
+
+/** WASD in character/camera yaw: W walks the visor heading, D strafes right. Yaw 0 is +Z. */
+export function rotateMove(localX: number, localZ: number, yaw: number): { x: number; z: number } {
+  const forward = yawToDir(yaw);
+  const rightX = Math.cos(yaw);
+  const rightZ = -Math.sin(yaw);
+  return {
+    x: rightX * localX + forward.x * localZ,
+    z: rightZ * localX + forward.z * localZ,
   };
 }

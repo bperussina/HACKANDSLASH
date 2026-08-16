@@ -94,7 +94,10 @@ export class Game {
     this.cameras.flushQueue(ripping);
 
     const aim = this.aimPoint();
-    const sample = this.input.sample(this.cameras.yaw(), aim.x, aim.z);
+    if (Math.hypot(aim.x, aim.z) > 0.05) {
+      this.hero.facing = Math.atan2(aim.x, aim.z);
+    }
+    const sample = this.input.sample(this.hero.facing ?? 0, aim.x, aim.z);
 
     if (sample.cameraTogglePressed) this.cameras.requestToggle(ripping);
     if (sample.pausePressed) {
